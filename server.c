@@ -5,7 +5,7 @@
 #include<arpa/inet.h>	
 #include<unistd.h>	
 #include<pthread.h> 
-#define PORT 8876
+#define PORT 8888
 
 int startMonte = 0;
 
@@ -105,9 +105,8 @@ void InsertEnd(CLIENT **start, CLIENT **end, int cl_sck) {
     }
 }
 
-/*
- * This will handle connection for each client
- * */
+
+ //This will handle connection for each client
 void *connection_handler(void *socket_desc)
 {
 	//Get the socket descriptor
@@ -116,6 +115,7 @@ void *connection_handler(void *socket_desc)
 	char *message , *message2, client_message[2000];
 	
 	//Send some messages to the client
+	message = '\0';
 	message = "You are connected to the server... Waiting all other clients connect...";
 	write(sock , message , strlen(message));
 	int number = 23, check = 0;

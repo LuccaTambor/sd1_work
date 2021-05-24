@@ -3,7 +3,7 @@
 #include <sys/socket.h>	//socket
 #include <arpa/inet.h>	//inet_addr
 #include <unistd.h>
-#define PORT 8876
+#define PORT 8888
 
 int main(int argc , char *argv[])
 {
