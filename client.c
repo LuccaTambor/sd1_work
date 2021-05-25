@@ -1,32 +1,30 @@
-#include <stdio.h>	//printf
-#include <string.h>	//strlen
-#include <sys/socket.h>	//socket
-#include <arpa/inet.h>	//inet_addr
+#include <stdio.h>	
+#include <string.h>	
+#include <sys/socket.h>	
+#include <arpa/inet.h>	
 #include <unistd.h>
 #define PORT 8888
 
-int main(int argc , char *argv[])
-{
+int main(int argc , char *argv[]) {
 	int sock;
 	struct sockaddr_in server;
 	char message[1000] , server_reply[2000];
 	int value_buffer = 0;
 	
-	//Create socket
+	//Creating socket
 	sock = socket(AF_INET , SOCK_STREAM , 0);
-	if (sock == -1)
-	{
+	if (sock == -1) {
 		printf("Could not create socket");
 	}
 	puts("Socket created");
 	
+	//Prepare the sockaddr_in structure
 	server.sin_addr.s_addr = inet_addr("127.0.0.1");
 	server.sin_family = AF_INET;
 	server.sin_port = htons(PORT);
 
 	//Connect to remote server
-	if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0)
-	{
+	if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0) {
 		perror("connect failed. Error");
 		return 1;
 	}
@@ -34,8 +32,7 @@ int main(int argc , char *argv[])
 	puts("Connected\n");
 
 	//Receive a reply from the server
-	if( recv(sock , server_reply , 2000 , 0) < 0)
-	{
+	if( recv(sock , server_reply , 2000 , 0) < 0) {
 		puts("recv failed");
 	}
 
@@ -43,6 +40,7 @@ int main(int argc , char *argv[])
 	puts(server_reply);
 	server_reply[0] = '\0';
 
+	//waiting all clients connect to start Monte Carlo
 	while(1) {
 		if( recv(sock , server_reply , 2000 , 0) < 0){
 			puts("recv failed");
