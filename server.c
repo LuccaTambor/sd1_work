@@ -50,7 +50,7 @@ int main(int argc , char *argv[])
 	puts("bind done");
 	
 	//Listen
-	listen(socket_desc , 3);
+	listen(socket_desc , qtd_clients);
 	
 	//Accept and incoming connection
 	puts("Waiting for incoming connections...");
