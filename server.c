@@ -5,7 +5,7 @@
 #include<arpa/inet.h>	
 #include<unistd.h>	
 #include<pthread.h> 
-#define PORT 8888
+#define PORT 8882
 
 int startMonte = 0;//Global Var for starting the Monte Carlo
 

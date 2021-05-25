@@ -3,7 +3,7 @@
 #include <sys/socket.h>	
 #include <arpa/inet.h>	
 #include <unistd.h>
-#define PORT 8888
+#define PORT 8882
 
 int main(int argc , char *argv[]) {
 	int sock;
