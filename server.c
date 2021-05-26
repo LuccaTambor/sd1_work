@@ -7,10 +7,10 @@
 #include<arpa/inet.h>	
 #include<unistd.h>	
 #include<pthread.h> 
-#define PORT 8881
+#define PORT 8879
 
 int startMonte = 0;//Global Var for starting the Monte Carlo
-double final_pi = 0;
+double final_pi = 0, points;
 
 //Struct for a list of client sockets
 typedef struct clients{
@@ -31,6 +31,12 @@ int main(int argc , char *argv[]) {
 
 	printf("How many clients you will use:");
 	scanf("%d", &qtd_clients);
+	srand(time(NULL));
+	//double points_seed = (rand() % (10 - 3 + 1)) + 3;//number of points that will be used in monte Carlo	
+	double points_seed = 4;
+	printf("seed: %f\n", points_seed);
+	points = pow((double)10.0,points_seed);
+	printf("points: %f\n", points);
 	
 	//Creating server socket
 	socket_server = socket(AF_INET , SOCK_STREAM , 0);
@@ -114,16 +120,11 @@ void InsertEnd(CLIENT **start, CLIENT **end, int cl_sck) {
 void *connection_handler(void *socket_server) {
 	//Get the socket descriptor
 	int sock = *(int*)socket_server;
-	int read_size;
 	double pi_buffer;
-	char *message , *message2, client_message[2000];
-	srand(time(NULL));
-	double points_seed = (rand() % (10 - 3 + 1)) + 3;//number of points that will be used in monte Carlo	
-	printf("seed: %f\n", points_seed);
-	double points = pow((double)10.0,points_seed);
-	printf("points: %f\n", points);
+	char message[2000] = "You are connected to the server... Waiting all other clients connect...";
+	char message2[2000] = "All clients connected!";
+	
 	//Sending messages to the client
-	message = "You are connected to the server... Waiting all other clients connect...";
 	send(sock , message , strlen(message), 0);
 	int check = 0;
 
@@ -131,19 +132,18 @@ void *connection_handler(void *socket_server) {
 	if(startMonte == 0) {
 		do {
 			if(startMonte == 1) {
-				message2 = "All clients connected!";
 				send(sock , message2 , strlen(message2),0);
-
 				check = 1;
 			}
 		}while (check == 0);
 	}
 	else if(startMonte == 1) {
-		message2 = "All clients connected!";
 		send(sock , message2 , strlen(message2),0);
 	}
 
+	puts("flag1");
 	send(sock , &points, sizeof(points),0);
+	puts("flag2");
 	
 	recv(sock, &pi_buffer, sizeof(pi_buffer), 0);
 	final_pi = final_pi + pi_buffer;

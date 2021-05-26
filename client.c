@@ -5,7 +5,7 @@
 #include <sys/socket.h>	
 #include <arpa/inet.h>	
 #include <unistd.h>
-#define PORT 8881
+#define PORT 8879
 
 int main(int argc , char *argv[]) {
 	int sock, check = 0, i, points_in = 0;
@@ -47,16 +47,21 @@ int main(int argc , char *argv[]) {
 		if( recv(sock , server_reply2 , 2000 , 0) < 0){
 			puts("recv failed");
 		}
-
-		puts("Server reply :");
-		puts(server_reply2);
 		check = 1;
 	}while (check == 0);
 
-	if( recv(sock , &value_buffer , sizeof(value_buffer) , 0) < 0){
-			puts("recv failed");
-	}
+	puts("Server reply :");
+	puts(server_reply2);
+
+	puts("flag1");
+	//if( recv(sock , &value_buffer , sizeof(value_buffer) , 0) < 0){
+			//puts("recv failed");
+	//}
+	recv(sock , &value_buffer , sizeof(value_buffer) , 0);
+	puts("flag2");
 	printf("\nValue from server: %f \n", value_buffer);
+	
+	
 
 	for( i = 0; i < value_buffer; i++) {//Loop where the points will be put on the quadrant
 		x = (double)rand() * ( 1.0 - 0.0 ) / (double)RAND_MAX + 0.0;//Coord of point x
@@ -74,7 +79,6 @@ int main(int argc , char *argv[]) {
 	
 	send(sock, &pi, sizeof(pi),0);
 	
-	printf("flag\n");
 	close(sock);
 	return 0;
 }
