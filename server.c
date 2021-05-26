@@ -7,28 +7,21 @@
 #include<arpa/inet.h>	
 #include<unistd.h>	
 #include<pthread.h> 
-#define PORT 8879
+#define PORT 8887
 
 int startMonte = 0;//Global Var for starting the Monte Carlo
 double final_pi = 0, points;
-
-//Struct for a list of client sockets
-typedef struct clients{
-     struct sockaddr_in clientAddr;
-	 int sck_client;
-     struct clients *next;
- }CLIENT;
+int controller = 0;
+int number_clients;
 
 //functions header
 void *connection_handler(void *);
-void InsertEnd(CLIENT **start, CLIENT **end, int cl_sck);
 
 int main(int argc , char *argv[]) {
-	int socket_server , socket_client , c , *new_sock, qtd_clients;
+	int socket_server , socket_client , c , *new_sock, qtd_clients, check = 0;
 	struct sockaddr_in server , client;
-	CLIENT *start = NULL, *end = NULL;
 	
-
+	number_clients = qtd_clients;
 	printf("How many clients you will use:");
 	scanf("%d", &qtd_clients);
 	srand(time(NULL));
@@ -43,7 +36,7 @@ int main(int argc , char *argv[]) {
 	if (socket_server == -1) {
 		printf("Could not create socket");
 	}
-	puts("Socket created");
+	//puts("Socket created");
 	
 	//Prepare the sockaddr_in structure
 	server.sin_family = AF_INET;
@@ -55,25 +48,24 @@ int main(int argc , char *argv[]) {
 		perror("bind failed. Error");
 		return 1;
 	}
-	puts("bind done");
+	//puts("bind done");
 	
 	//Listening to connections
 	listen(socket_server , qtd_clients);
 	
 	//Accept and incoming connections
-	puts("Waiting for incoming connections...");
+	//puts("Waiting for incoming connections...");
 	c = sizeof(struct sockaddr_in);
 
 	//Loop that will wait all clients connect
-	while( (socket_client = accept(socket_server, (struct sockaddr *)&client, (socklen_t*)&c)) ) {
-		puts("Connection accepted");
-		qtd_clients--;
-		InsertEnd(&start, &end, socket_client);
+	while( (socket_client = accept(socket_server, (struct sockaddr *)&client, (socklen_t*)&c)) && check == 0) {
+		//puts("Connection accepted");
+		
 		
 		pthread_t sniffer_thread;
 		new_sock = malloc(sizeof(int));
 		*new_sock = socket_client;
-
+		qtd_clients--;
 		//Verifing if all clients are connect, if yes, Start Monte Carlo
 		if(qtd_clients == 0) {
 			startMonte = 1;
@@ -84,37 +76,24 @@ int main(int argc , char *argv[]) {
 			perror("could not create thread");
 			return 1;
 		}
+
+		
 		
 		//Now join the thread , so that we dont terminate before the thread
 		//pthread_join( sniffer_thread , NULL);
+		
 		puts("Handler assigned");
+		if(controller == number_clients) {
+			check = 1;
+		}
 	}
 	
-	if (socket_client < 0) {
-		perror("accept failed");
-		return 1;
-	}
+	double final_value_of_pi = final_pi / number_clients;
+	printf("Final Value of Pi: %f\n", final_value_of_pi);
 	close(socket_server);
 	
 	return 0;
 }
-
-//Linked List Insertion Function
-void InsertEnd(CLIENT **start, CLIENT **end, int cl_sck) {
-    CLIENT *new = (CLIENT *)malloc(sizeof(CLIENT));
-	new->sck_client = cl_sck;
-    if(*start==NULL) { //Empty list 
-        *start = new;
-        *end = new;
-        new->next = NULL;
-    }
-    else {//List is not empty
-        (*end)->next=new;
-        *end = new;
-        (*end)->next = NULL;
-    }
-}
-
 
 //This will handle connection for each client
 void *connection_handler(void *socket_server) {
@@ -129,25 +108,20 @@ void *connection_handler(void *socket_server) {
 	int check = 0;
 
 	//Waiting all clients be connected
-	if(startMonte == 0) {
-		do {
-			if(startMonte == 1) {
-				send(sock , message2 , strlen(message2),0);
-				check = 1;
-			}
-		}while (check == 0);
-	}
-	else if(startMonte == 1) {
-		send(sock , message2 , strlen(message2),0);
-	}
+	do {
+		if(startMonte == 1) {
+			send(sock , message2 , strlen(message2),0);
+			check = 1;
+		}
+	}while (check == 0);
 
-	puts("flag1");
 	send(sock , &points, sizeof(points),0);
-	puts("flag2");
+	printf("%d\n", sock);
 	
 	recv(sock, &pi_buffer, sizeof(pi_buffer), 0);
 	final_pi = final_pi + pi_buffer;
 	printf("pi = %f\n", final_pi);
+	controller++;
 		
 	//Free the socket pointer
 	free(socket_server);

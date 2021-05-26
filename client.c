@@ -4,8 +4,9 @@
 #include <stdlib.h>
 #include <sys/socket.h>	
 #include <arpa/inet.h>	
+#include <sys/select.h>
 #include <unistd.h>
-#define PORT 8879
+#define PORT 8887
 
 int main(int argc , char *argv[]) {
 	int sock, check = 0, i, points_in = 0;
@@ -52,12 +53,12 @@ int main(int argc , char *argv[]) {
 
 	puts("Server reply :");
 	puts(server_reply2);
-
 	puts("flag1");
 	//if( recv(sock , &value_buffer , sizeof(value_buffer) , 0) < 0){
 			//puts("recv failed");
 	//}
-	recv(sock , &value_buffer , sizeof(value_buffer) , 0);
+	printf("%d\n", sock);
+	recv(sock , &value_buffer , sizeof(value_buffer),0);
 	puts("flag2");
 	printf("\nValue from server: %f \n", value_buffer);
 	
