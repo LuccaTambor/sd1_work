@@ -5,13 +5,14 @@
 #include <sys/socket.h>	
 #include <arpa/inet.h>	
 #include <unistd.h>
-#define PORT 8887
+#define PORT 8881
 
 int main(int argc , char *argv[]) {
-	int sock, check = 0;
+	int sock, check = 0, i, points_in = 0;
 	struct sockaddr_in server;
 	char message[1000] , server_reply[2000], server_reply2[2000];
-	int value_buffer = 0;
+	double value_buffer = 0, x, y;
+	srand(time(NULL));
 	
 	//Creating socket
 	sock = socket(AF_INET , SOCK_STREAM , 0);
@@ -55,7 +56,23 @@ int main(int argc , char *argv[]) {
 	if( recv(sock , &value_buffer , sizeof(value_buffer) , 0) < 0){
 			puts("recv failed");
 	}
-	printf("\nValue from server: %d \n", value_buffer);
+	printf("\nValue from server: %f \n", value_buffer);
+
+	for( i = 0; i < value_buffer; i++) {//Loop where the points will be put on the quadrant
+		x = (double)rand() * ( 1.0 - 0.0 ) / (double)RAND_MAX + 0.0;//Coord of point x
+		y = (double)rand() * ( 1.0 - 0.0 ) / (double)RAND_MAX + 0.0;//Coord of point y
+		
+		if(x * x + y * y < 1) {//The point is in the circle
+			points_in++;
+		}
+    }
+
+	printf("\nPoints in: %d \n", points_in);
+
+	double pi = 4.0 * points_in/value_buffer;//Pi
+	printf("Value of pi: %f \n", pi);
+	
+	send(sock, &pi, sizeof(pi),0);
 	
 	printf("flag\n");
 	close(sock);

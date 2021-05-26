@@ -2,13 +2,15 @@
 #include<string.h>
 #include<time.h>
 #include<stdlib.h>	
+#include<math.h>
 #include<sys/socket.h>
 #include<arpa/inet.h>	
 #include<unistd.h>	
 #include<pthread.h> 
-#define PORT 8887
+#define PORT 8881
 
 int startMonte = 0;//Global Var for starting the Monte Carlo
+double final_pi = 0;
 
 //Struct for a list of client sockets
 typedef struct clients{
@@ -113,28 +115,39 @@ void *connection_handler(void *socket_server) {
 	//Get the socket descriptor
 	int sock = *(int*)socket_server;
 	int read_size;
+	double pi_buffer;
 	char *message , *message2, client_message[2000];
 	srand(time(NULL));
-	int points_seed = (rand() % (10 - 3 + 1)) + 3;//number of points that will be used in monte Carlo	
-	printf("seed: %d\n", points_seed);
-	int points = 10^points_seed;
+	double points_seed = (rand() % (10 - 3 + 1)) + 3;//number of points that will be used in monte Carlo	
+	printf("seed: %f\n", points_seed);
+	double points = pow((double)10.0,points_seed);
+	printf("points: %f\n", points);
 	//Sending messages to the client
 	message = "You are connected to the server... Waiting all other clients connect...";
 	send(sock , message , strlen(message), 0);
 	int check = 0;
 
 	//Waiting all clients be connected
-	do {
-		if(startMonte == 1) {
-			message2 = "All clients connected!";
-			send(sock , message2 , strlen(message2),0);
+	if(startMonte == 0) {
+		do {
+			if(startMonte == 1) {
+				message2 = "All clients connected!";
+				send(sock , message2 , strlen(message2),0);
 
-			check = 1;
-		}
-	}while (check == 0);
+				check = 1;
+			}
+		}while (check == 0);
+	}
+	else if(startMonte == 1) {
+		message2 = "All clients connected!";
+		send(sock , message2 , strlen(message2),0);
+	}
 
 	send(sock , &points, sizeof(points),0);
-	puts("flag");
+	
+	recv(sock, &pi_buffer, sizeof(pi_buffer), 0);
+	final_pi = final_pi + pi_buffer;
+	printf("pi = %f\n", final_pi);
 		
 	//Free the socket pointer
 	free(socket_server);
