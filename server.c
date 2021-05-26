@@ -1,11 +1,12 @@
 #include<stdio.h>
 #include<string.h>
+#include<time.h>
 #include<stdlib.h>	
 #include<sys/socket.h>
 #include<arpa/inet.h>	
 #include<unistd.h>	
 #include<pthread.h> 
-#define PORT 8882
+#define PORT 8887
 
 int startMonte = 0;//Global Var for starting the Monte Carlo
 
@@ -23,7 +24,8 @@ void InsertEnd(CLIENT **start, CLIENT **end, int cl_sck);
 int main(int argc , char *argv[]) {
 	int socket_server , socket_client , c , *new_sock, qtd_clients;
 	struct sockaddr_in server , client;
-	CLIENT *start = NULL, *end = NULL;	
+	CLIENT *start = NULL, *end = NULL;
+	
 
 	printf("How many clients you will use:");
 	scanf("%d", &qtd_clients);
@@ -61,7 +63,7 @@ int main(int argc , char *argv[]) {
 		InsertEnd(&start, &end, socket_client);
 		
 		pthread_t sniffer_thread;
-		new_sock = malloc(1);
+		new_sock = malloc(sizeof(int));
 		*new_sock = socket_client;
 
 		//Verifing if all clients are connect, if yes, Start Monte Carlo
@@ -112,44 +114,27 @@ void *connection_handler(void *socket_server) {
 	int sock = *(int*)socket_server;
 	int read_size;
 	char *message , *message2, client_message[2000];
-	
+	srand(time(NULL));
+	int points_seed = (rand() % (10 - 3 + 1)) + 3;//number of points that will be used in monte Carlo	
+	printf("seed: %d\n", points_seed);
+	int points = 10^points_seed;
 	//Sending messages to the client
-	message = '\0';
 	message = "You are connected to the server... Waiting all other clients connect...";
-	write(sock , message , strlen(message));
-	int number = 23, check = 0;
+	send(sock , message , strlen(message), 0);
+	int check = 0;
 
 	//Waiting all clients be connected
 	do {
 		if(startMonte == 1) {
 			message2 = "All clients connected!";
-			write(sock , message2 , strlen(message2));
+			send(sock , message2 , strlen(message2),0);
 
-			int num = 23;
-			send(sock , &num, sizeof(num),0);
-			
 			check = 1;
 		}
 	}while (check == 0);
 
-	
-	//Receive a message from client
-	/*while( (read_size = recv(sock , client_message , 2000 , 0)) > 0 )
-	{
-		//Send the message back to client
-		write(sock , client_message , strlen(client_message));
-	}
-	
-	if(read_size == 0)
-	{
-		puts("Client disconnected");
-		fflush(stdout);
-	}
-	else if(read_size == -1)
-	{
-		perror("recv failed");
-	}
-	*/
+	send(sock , &points, sizeof(points),0);
+	puts("flag");
 		
 	//Free the socket pointer
 	free(socket_server);

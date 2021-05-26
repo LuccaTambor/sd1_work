@@ -1,14 +1,16 @@
 #include <stdio.h>	
 #include <string.h>	
+#include <time.h>
+#include <stdlib.h>
 #include <sys/socket.h>	
 #include <arpa/inet.h>	
 #include <unistd.h>
-#define PORT 8882
+#define PORT 8887
 
 int main(int argc , char *argv[]) {
-	int sock;
+	int sock, check = 0;
 	struct sockaddr_in server;
-	char message[1000] , server_reply[2000];
+	char message[1000] , server_reply[2000], server_reply2[2000];
 	int value_buffer = 0;
 	
 	//Creating socket
@@ -38,49 +40,24 @@ int main(int argc , char *argv[]) {
 
 	puts("Server reply :");
 	puts(server_reply);
-	server_reply[0] = '\0';
-
+	
 	//waiting all clients connect to start Monte Carlo
-	while(1) {
-		if( recv(sock , server_reply , 2000 , 0) < 0){
+	do {
+		if( recv(sock , server_reply2 , 2000 , 0) < 0){
 			puts("recv failed");
 		}
 
 		puts("Server reply :");
-		puts(server_reply);
-		server_reply[0] = '\0';
+		puts(server_reply2);
+		check = 1;
+	}while (check == 0);
 
-
-		if( recv(sock , &value_buffer , sizeof(value_buffer) , 0) < 0){
+	if( recv(sock , &value_buffer , sizeof(value_buffer) , 0) < 0){
 			puts("recv failed");
-		}
-		printf("\nValue from server: %d", value_buffer);
 	}
-
+	printf("\nValue from server: %d \n", value_buffer);
 	
-	
-	//keep communicating with server
-	/*while(1)
-	{
-		//printf("Enter message : ");
-		//scanf("%s" , message);
-		
-		//Send some data
-		/*if( send(sock , message , strlen(message) , 0) < 0)
-		{
-			puts("Send failed");
-			return 1;
-		}
-		
-		
-		
-		
-		puts("Server reply :");
-		puts(server_reply);
-	}
-	*/
-	
-	
+	printf("flag\n");
 	close(sock);
 	return 0;
 }
