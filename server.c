@@ -18,12 +18,12 @@ int number_clients;
 void *connection_handler(void *);
 
 int main(int argc , char *argv[]) {
-	int socket_server , socket_client , c , *new_sock, qtd_clients, check = 0;
+	int socket_server , socket_client , c , *new_sock, qtd_clients=0, check = 0;
 	struct sockaddr_in server , client;
 	
-	number_clients = qtd_clients;
+	
 	printf("How many clients you will use:");
-	scanf("%d", &qtd_clients);
+	scanf("%d", &number_clients);
 	srand(time(NULL));
 	//double points_seed = (rand() % (10 - 3 + 1)) + 3;//number of points that will be used in monte Carlo	
 	double points_seed = 4;
@@ -51,38 +51,37 @@ int main(int argc , char *argv[]) {
 	//puts("bind done");
 	
 	//Listening to connections
-	listen(socket_server , qtd_clients);
+	listen(socket_server , number_clients);
 	
 	//Accept and incoming connections
 	//puts("Waiting for incoming connections...");
 	c = sizeof(struct sockaddr_in);
 
 	//Loop that will wait all clients connect
-	while( (socket_client = accept(socket_server, (struct sockaddr *)&client, (socklen_t*)&c)) && check == 0) {
+	while(check == 0) {
 		//puts("Connection accepted");
+		if(qtd_clients < number_clients) {
+			socket_client = accept(socket_server, (struct sockaddr *)&client, (socklen_t*)&c);
+			pthread_t sniffer_thread;
+			new_sock = malloc(sizeof(int));
+			*new_sock = socket_client;
+			qtd_clients++;
+			//Verifing if all clients are connect, if yes, Start Monte Carlo
+			if(qtd_clients == number_clients) {
+				startMonte = 1;
+			}
 		
+			//creating a thread to handle this client
+			if( pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*) new_sock) < 0) {
+				perror("could not create thread");
+				return 1;
+			}
+			//Now join the thread , so that we dont terminate before the thread
+			//pthread_join( sniffer_thread , NULL);
 		
-		pthread_t sniffer_thread;
-		new_sock = malloc(sizeof(int));
-		*new_sock = socket_client;
-		qtd_clients--;
-		//Verifing if all clients are connect, if yes, Start Monte Carlo
-		if(qtd_clients == 0) {
-			startMonte = 1;
+			puts("Handler assigned");
 		}
 		
-		//creating a thread to handle this client
-		if( pthread_create( &sniffer_thread , NULL ,  connection_handler , (void*) new_sock) < 0) {
-			perror("could not create thread");
-			return 1;
-		}
-
-		
-		
-		//Now join the thread , so that we dont terminate before the thread
-		//pthread_join( sniffer_thread , NULL);
-		
-		puts("Handler assigned");
 		if(controller == number_clients) {
 			check = 1;
 		}
