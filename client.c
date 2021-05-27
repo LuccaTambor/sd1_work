@@ -44,7 +44,7 @@ int main(int argc , char *argv[]) {
 		check = 1;
 	}while (check == 0);
 
-	printf("double v: %f", value_buffer);
+	printf("points to be sorted: %f", value_buffer);
 
 	for( i = 0; i < value_buffer; i++) {//Loop where the points will be put on the quadrant
 		x = (double)rand() * ( 1.0 - 0.0 ) / (double)RAND_MAX + 0.0;//Coord of point x

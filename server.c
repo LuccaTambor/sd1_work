@@ -30,8 +30,7 @@ int main(int argc , char *argv[]) {
 	printf("How many points will you use : 10^");
 	scanf("%lf", &points_seed);
 	points = pow((double)10.0,points_seed);
-	printf("points: %f\n", points);
-	
+
 	//Creating server socket
 	socket_server = socket(AF_INET , SOCK_STREAM , 0);
 	if (socket_server == -1) {
@@ -53,7 +52,7 @@ int main(int argc , char *argv[]) {
 	listen(socket_server , number_clients);
 	
 	//Accept and incoming connections
-	//puts("Waiting for incoming connections...");
+	puts("Waiting for incoming connections...");
 	c = sizeof(struct sockaddr_in);
 
 	//Loop that will wait all clients connect
@@ -68,6 +67,7 @@ int main(int argc , char *argv[]) {
 			//Verifing if all clients are connect, if yes, Start Monte Carlo
 			if(qtd_clients == number_clients) {
 				startMonte = 1;
+				//começo do clock
 			}
 		
 			//creating a thread to handle this client
@@ -81,10 +81,12 @@ int main(int argc , char *argv[]) {
 		
 		if(controller == number_clients) {
 			check = 1;
+
 		}
 	}
 	double final_value_of_pi = final_pi / number_clients;
 	printf("Final Value of Pi: %f\n", final_value_of_pi);
+	//fim do clock
 	close(socket_server);
 	
 	return 0;
@@ -94,13 +96,14 @@ int main(int argc , char *argv[]) {
 void *client_handler(void *socket_client) {
 	//Get the socket descriptor
 	int sock = *(int*)socket_client;
-	double pi_buffer;
+	double pi_buffer, points_client;
 	cont++;
-	
+	points_client = points/number_clients;
+
 	//Waiting all clients be connected
 	while(cont != number_clients) { }
 
-	send(sock , &points, sizeof(points),0);
+	send(sock , &points_client, sizeof(points_client),0);
 	
 	recv(sock, &pi_buffer, sizeof(pi_buffer), 0);
 	
