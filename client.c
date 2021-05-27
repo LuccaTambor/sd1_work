@@ -6,7 +6,7 @@
 #include <arpa/inet.h>	
 #include <sys/select.h>
 #include <unistd.h>
-#define PORT 8887
+#define PORT 8888
 
 int main(int argc , char *argv[]) {
 	int sock, check = 0, i, points_in = 0;
@@ -34,35 +34,17 @@ int main(int argc , char *argv[]) {
 	}
 	
 	puts("Connected\n");
+	puts("You are connected to the server... Waiting all other clients connect...");
 
-	//Receive a reply from the server
-	if( recv(sock , server_reply , 2000 , 0) < 0) {
-		puts("recv failed");
-	}
-
-	puts("Server reply :");
-	puts(server_reply);
-	
 	//waiting all clients connect to start Monte Carlo
 	do {
-		if( recv(sock , server_reply2 , 2000 , 0) < 0){
+		if( recv(sock , &value_buffer , sizeof(value_buffer) , 0) < 0){
 			puts("recv failed");
 		}
 		check = 1;
 	}while (check == 0);
 
-	puts("Server reply :");
-	puts(server_reply2);
-	puts("flag1");
-	//if( recv(sock , &value_buffer , sizeof(value_buffer) , 0) < 0){
-			//puts("recv failed");
-	//}
-	printf("%d\n", sock);
-	recv(sock , &value_buffer , sizeof(value_buffer),0);
-	puts("flag2");
-	printf("\nValue from server: %f \n", value_buffer);
-	
-	
+	printf("double v: %f", value_buffer);
 
 	for( i = 0; i < value_buffer; i++) {//Loop where the points will be put on the quadrant
 		x = (double)rand() * ( 1.0 - 0.0 ) / (double)RAND_MAX + 0.0;//Coord of point x
@@ -83,6 +65,3 @@ int main(int argc , char *argv[]) {
 	close(sock);
 	return 0;
 }
-
-
-
