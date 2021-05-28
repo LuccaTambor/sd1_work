@@ -9,6 +9,7 @@
 #include<pthread.h> 
 #include <time.h>
 #define PORT 8888
+#define BILLION  1000000000.0
 
 int startMonte = 0;//Global Var for starting the Monte Carlo
 double final_pi = 0, points;
@@ -20,11 +21,13 @@ int cont = 0;
 void *client_handler(void *);
 
 int main(int argc , char *argv[]) {
-	clock_t timer; //time meditor var
 	int socket_server , socket_client , c , *new_sock, qtd_clients=0, check = 0;
 	double points_seed;
 	struct sockaddr_in server , client;
 	pthread_t sniffer_thread;
+	struct timespec start, end;
+	
+
 	srand(time(NULL));
 	
 	printf("How many clients you will use [2 | 4 | 8 | 16]:");
@@ -69,7 +72,7 @@ int main(int argc , char *argv[]) {
 			//Verifing if all clients are connect, if yes, Start Monte Carlo
 			if(qtd_clients == number_clients) {
 				startMonte = 1;
-				timer = clock(); //start time count
+				clock_gettime(CLOCK_REALTIME, &start);
 			}
 		
 			//creating a thread to handle this client
@@ -87,9 +90,10 @@ int main(int argc , char *argv[]) {
 		}
 	}
 	double final_value_of_pi = final_pi / number_clients;
-	timer = clock() - timer; // finish time count
+	clock_gettime(CLOCK_REALTIME, &end);
+	long double time_spent = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec)/BILLION;
 	printf("Final Value of Pi: %f\n", final_value_of_pi);
-	printf("Time duration: %lf milliseconds.\n", ((double)timer)/((CLOCKS_PER_SEC/1000)));
+	printf("Time duration: %Lf seconds.\n", time_spent);
 	close(socket_server);
 	
 	return 0;
