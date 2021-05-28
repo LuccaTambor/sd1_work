@@ -7,6 +7,7 @@
 #include<arpa/inet.h>	
 #include<unistd.h>	
 #include<pthread.h> 
+#include <time.h>
 #define PORT 8888
 
 int startMonte = 0;//Global Var for starting the Monte Carlo
@@ -19,6 +20,7 @@ int cont = 0;
 void *client_handler(void *);
 
 int main(int argc , char *argv[]) {
+	clock_t timer; //time meditor var
 	int socket_server , socket_client , c , *new_sock, qtd_clients=0, check = 0;
 	double points_seed;
 	struct sockaddr_in server , client;
@@ -67,7 +69,7 @@ int main(int argc , char *argv[]) {
 			//Verifing if all clients are connect, if yes, Start Monte Carlo
 			if(qtd_clients == number_clients) {
 				startMonte = 1;
-				//começo do clock
+				timer = clock(); //start time count
 			}
 		
 			//creating a thread to handle this client
@@ -86,7 +88,8 @@ int main(int argc , char *argv[]) {
 	}
 	double final_value_of_pi = final_pi / number_clients;
 	printf("Final Value of Pi: %f\n", final_value_of_pi);
-	//fim do clock
+	timer = clock() - timer; // finish time count
+	printf("Time duration: %lf milliseconds.\n", ((double)timer)/((CLOCKS_PER_SEC/1000)));
 	close(socket_server);
 	
 	return 0;
