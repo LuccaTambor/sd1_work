@@ -1,31 +1,36 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <time.h>
 
 int main() {
-    int num = 0, i = 0, acertos = 0;
-    double x,y;
+    int i = 0, points_in = 0;
+    double x,y, points, points_seed;
+    clock_t timer;
 
-    srand(time(0));//Gerando seed de aleatoriedade
+    srand(time(0));//Random seed
 
-    num = (rand() % (5000000 - 4550000 + 1)) + 4550000;//número de pontos que serão posicionados
+    printf("How many points will be sorted: 10^");
+    scanf("%lf", &points_seed);
 
-    //printf("%d\n", num);//Número de pontos
+    points = pow(10, points_seed);
     
-    for( i = 0; i < num; i++) {//Loop onde os pontos serão colocados no quadrante
-        x = (double)rand() * ( 1.0 - 0.0 ) / (double)RAND_MAX + 0.0;//Coordenada x do ponto
-        y = (double)rand() * ( 1.0 - 0.0 ) / (double)RAND_MAX + 0.0;//Coordenada y do ponto
+    timer = clock(); //start time count
+    for( i = 0; i < points; i++) {//Loop where the point will be sorted
+        x = (double)rand() * ( 1.0 - 0.0 ) / (double)RAND_MAX + 0.0;//x coordinate
+        y = (double)rand() * ( 1.0 - 0.0 ) / (double)RAND_MAX + 0.0;//y coordinate
         
-        if(x * x + y * y < 1) {//O ponto se econtra dentro da circunferência
-            acertos++;
+        if(x * x + y * y < 1) {//The point is in the circle
+            points_in++;
         }
     }
 
-    printf("%d\n", acertos);//Número de pontos dentro da circunferência
+    printf("%d\n", points_in);//Numbers of points inside the circle
 
-    double pi = 4.0 * acertos/num;//Calculanddo pi
-
+    double pi = 4.0 * points_in/points;//Pi
+    timer = clock() - timer; // finish time count
     printf("%f\n", pi);
+	printf("Time duration: %lf milliseconds.\n", ((double)timer)/((CLOCKS_PER_SEC/1000)));
 
     return 0;
 }

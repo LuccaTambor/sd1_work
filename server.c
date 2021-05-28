@@ -87,8 +87,8 @@ int main(int argc , char *argv[]) {
 		}
 	}
 	double final_value_of_pi = final_pi / number_clients;
-	printf("Final Value of Pi: %f\n", final_value_of_pi);
 	timer = clock() - timer; // finish time count
+	printf("Final Value of Pi: %f\n", final_value_of_pi);
 	printf("Time duration: %lf milliseconds.\n", ((double)timer)/((CLOCKS_PER_SEC/1000)));
 	close(socket_server);
 	
