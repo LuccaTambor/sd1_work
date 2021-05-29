@@ -9,10 +9,11 @@
 #define PORT 8888
 
 int main(int argc , char *argv[]) {
-	int sock, check = 0, i, points_in = 0;
+	int sock, check = 0;
 	struct sockaddr_in server;
 	char message[1000] , server_reply[2000], server_reply2[2000];
-	double value_buffer = 0, x, y;
+	double x, y;
+	unsigned long int value_buffer,i , points_in = 0;
 	srand(time(NULL));
 	
 	//Creating socket
@@ -44,7 +45,7 @@ int main(int argc , char *argv[]) {
 		check = 1;
 	}while (check == 0);
 
-	printf("points to be sorted: %f", value_buffer);
+	printf("points to be sorted: %ld", value_buffer);
 
 	for( i = 0; i < value_buffer; i++) {//Loop where the points will be put on the quadrant
 		x = (double)rand() * ( 1.0 - 0.0 ) / (double)RAND_MAX + 0.0;//Coord of point x
@@ -55,7 +56,7 @@ int main(int argc , char *argv[]) {
 		}
     }
 
-	printf("\nPoints in: %d \n", points_in);
+	printf("\nPoints in: %ld \n", points_in);
 
 	double pi = 4.0 * points_in/value_buffer;//Pi
 	printf("Value of pi: %f \n", pi);

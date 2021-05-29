@@ -12,7 +12,8 @@
 #define BILLION  1000000000.0
 
 int startMonte = 0;//Global Var for starting the Monte Carlo
-double final_pi = 0, points;
+double final_pi = 0; 
+unsigned long int points;
 int controller = 0;
 int number_clients;
 int cont = 0;
@@ -34,7 +35,7 @@ int main(int argc , char *argv[]) {
 	scanf("%d", &number_clients);
 	printf("How many points will you use : 10^");
 	scanf("%lf", &points_seed);
-	points = pow((double)10.0,points_seed);
+	points = (unsigned long int) pow((double)10.0,points_seed);
 
 	//Creating server socket
 	socket_server = socket(AF_INET , SOCK_STREAM , 0);
@@ -103,7 +104,8 @@ int main(int argc , char *argv[]) {
 void *client_handler(void *socket_client) {
 	//Get the socket descriptor
 	int sock = *(int*)socket_client;
-	double pi_buffer, points_client;
+	double pi_buffer;
+	unsigned long int points_client;
 	cont++;
 	points_client = points/number_clients;
 
@@ -115,7 +117,7 @@ void *client_handler(void *socket_client) {
 	recv(sock, &pi_buffer, sizeof(pi_buffer), 0);
 	
 	final_pi = final_pi + pi_buffer;
-	printf("pi = %f\n", final_pi);
+	//printf("pi = %f\n", final_pi);
 	controller++;
 	
 	//Free the socket pointer
