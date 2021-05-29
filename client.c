@@ -21,7 +21,7 @@ int main(int argc , char *argv[]) {
 	if (sock == -1) {
 		printf("Could not create socket");
 	}
-	puts("Socket created");
+	//puts("Socket created");
 	
 	//Prepare the sockaddr_in structure
 	server.sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -34,8 +34,8 @@ int main(int argc , char *argv[]) {
 		return 1;
 	}
 	
-	puts("Connected\n");
-	puts("You are connected to the server... Waiting all other clients connect...");
+	//puts("Connected\n");
+	//puts("You are connected to the server... Waiting all other clients connect...");
 
 	//waiting all clients connect to start Monte Carlo
 	do {
@@ -45,7 +45,7 @@ int main(int argc , char *argv[]) {
 		check = 1;
 	}while (check == 0);
 
-	printf("points to be sorted: %ld", value_buffer);
+	//printf("points to be sorted: %ld", value_buffer);
 
 	for( i = 0; i < value_buffer; i++) {//Loop where the points will be put on the quadrant
 		x = (double)rand() * ( 1.0 - 0.0 ) / (double)RAND_MAX + 0.0;//Coord of point x
@@ -56,10 +56,10 @@ int main(int argc , char *argv[]) {
 		}
     }
 
-	printf("\nPoints in: %ld \n", points_in);
+	//printf("\nPoints in: %ld \n", points_in);
 
 	double pi = 4.0 * points_in/value_buffer;//Pi
-	printf("Value of pi: %f \n", pi);
+	//printf("Value of pi: %f \n", pi);
 	
 	send(sock, &pi, sizeof(pi),0);
 	

@@ -22,7 +22,7 @@ int cont = 0;
 void *client_handler(void *);
 
 int main(int argc , char *argv[]) {
-	int socket_server , socket_client , c , *new_sock, qtd_clients=0, check = 0;
+	int socket_server , socket_client , c , *new_sock, qtd_clients=0, check = 0,i;
 	double points_seed;
 	struct sockaddr_in server , client;
 	pthread_t sniffer_thread;
@@ -36,7 +36,7 @@ int main(int argc , char *argv[]) {
 	printf("How many points will you use : 10^");
 	scanf("%lf", &points_seed);
 	points = (unsigned long int) pow((double)10.0,points_seed);
-
+	
 	//Creating server socket
 	socket_server = socket(AF_INET , SOCK_STREAM , 0);
 	if (socket_server == -1) {
@@ -56,6 +56,10 @@ int main(int argc , char *argv[]) {
 	
 	//Listening to connections
 	listen(socket_server , number_clients);
+
+	for(i=0; i < number_clients; i++) {
+		system("./client &");
+	}
 	
 	//Accept and incoming connections
 	puts("Waiting for incoming connections...");
@@ -64,6 +68,7 @@ int main(int argc , char *argv[]) {
 	//Loop that will wait all clients connect
 	while(check == 0) {
 		//puts("Connection accepted");
+		//system("./client");
 		if(qtd_clients < number_clients) {
 			socket_client = accept(socket_server, (struct sockaddr *)&client, (socklen_t*)&c);
 			
