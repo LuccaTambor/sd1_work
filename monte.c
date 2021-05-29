@@ -5,8 +5,8 @@
 #define BILLION  1000000000.0
 
 int main() {
-    int i = 0, points_in = 0;
-    double x,y, points, points_seed;
+    unsigned long int i = 0, points_in = 0, points; 
+    double x,y, points_seed;
     struct timespec start, end;
 
     srand(time(0));//Random seed
@@ -14,7 +14,7 @@ int main() {
     printf("How many points will be sorted: 10^");
     scanf("%lf", &points_seed);
 
-    points = pow(10, points_seed);
+    points =(unsigned long int) pow(10, points_seed);
     clock_gettime(CLOCK_REALTIME, &start);
     for( i = 0; i < points; i++) {//Loop where the point will be sorted
         x = (double)rand() * ( 1.0 - 0.0 ) / (double)RAND_MAX + 0.0;//x coordinate
